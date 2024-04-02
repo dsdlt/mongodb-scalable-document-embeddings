@@ -118,40 +118,40 @@ After that, will create a stream processor with a pipeline to filter inserted an
 ```bash
 sp.lyrics_source_cluster.stop()
 sp.lyrics_source_cluster.drop()
-````
+```
 2. **Create the connection to the MongoDB cluster**
-````json
+```bash
 lyrics_source_cluster={$source: { connectionName: "LyricsCluster", db: "streamingvectors", coll : "lyrics", config: {fullDocument : 'updateLookup'}}}
-````
+```
 3. **Create the pipelines for songs in both languages**
 
-````json
+```bash
 only_lyrics_in_english={$match: {operationType: {$in: ["insert", "update"]}, "fullDocument.language": "en", "fullDocument.updated": false}}
 only_lyrics_in_spanish={$match: {operationType: {$in: ["insert", "update"]}, "fullDocument.language": "es", "fullDocument.updated": false}}
 project_year={$project: {"fullDocument.lyrics": 1, "fullDocument._id": 1}}
 send_to_kafka_english={$emit: {connectionName: "KafkaConfluent",topic: "EnglishInputTopic"}}
 send_to_kafka_spanish={$emit: {connectionName: "KafkaConfluent",topic: "SpanishInputTopic"}}
-````
+```
 4. **Create the stream processors using the pipelines**
-````json
+```bash
 sp.createStreamProcessor("lyrics_source_cluster_english", [lyrics_source_cluster, only_lyrics_in_english, project_year, send_to_kafka_english])
 
 sp.createStreamProcessor("lyrics_source_cluster_spanish", [lyrics_source_cluster, only_lyrics_in_spanish, project_year, send_to_kafka_spanish])
-````
+```
 5. **Start processing documents**
 
 ```bash
 sp.lyrics_source_cluster_english.start()
 sp.lyrics_source_cluster_spanish.start()
-````
+```
 In case you want a list of stream processors you can execute the following command:
 ```bash
 sp.listStreamProcessors()
-````
+```
 You can filter stream processors by their name:
 ```bash
 sp.listStreamProcessors({name : 'lyrics_source_cluster_english'})
-````
+```
 Now we will create the connection between the output topic from the Kafka cluster and Stream Processing
 
 
@@ -160,13 +160,13 @@ Now we will create the connection between the output topic from the Kafka cluste
 ```bash
 sp.lyrics_destination_cluster.stop()
 sp.lyrics_destination_cluster.drop()
-````
+```
 2. **Create the connection to the MongoDB cluster**
-````json
+```bash
 lyrics_output_topic={$source: { connectionName: "KafkaConfluent", topic: "OutputTopic"}}
-````
+```
 3. **Create the pipeline to update the documents in MongoDB**:
-````json
+```bash
 project_metadata = {$project : {last_updated : '$_ts', _stream_meta: 0}}
 update_lyrics_embedding = {
    $merge: {
@@ -180,20 +180,20 @@ update_lyrics_embedding = {
       whenNotMatched: "insert"
    }
 }
-````
+```
 4. **Create the stream processors using the pipelines**
 ```bash
 sp.createStreamProcessor("lyrics_destination_cluster", [lyrics_output_topic, update_lyrics_embedding])
-````
+```
 5. **Start processing documents**
 ```bash
 sp.lyrics_destination_cluster.start()
-````
+```
 
 We can preview a stream processor with the following command:
 ```bash
 sp.lyrics_destination_cluster.sample()
-````
+```
 
 ## Launch the processor scripts
 The metadata service is a Python script that will subscribe to their corresponding topic to generate the embeddings using a language specific LLM model and will generate a list of tags based on the contents of the lyrics using the Python library [Spacy](https://spacy.io/)
@@ -204,7 +204,7 @@ After processing the document, it will send the event to the Output topic.
 ```bash
 python3 server/metadataservice.py -l english
 python3 server/metadataservice.py -l spanish
-````
+```
 
 After executing the metadata service, the messages will start to appear in the Kafka cluster topics.
 
@@ -221,7 +221,7 @@ We are using different models for each language to increase the accuracy of the 
 
 
 **Spanish Atlas Vector Search Index**:
-`````json
+```bash
 {
   "fields": [
     {
@@ -232,10 +232,10 @@ We are using different models for each language to increase the accuracy of the 
     }
   ]
 }
-````
+```
 **English Atlas Vector Search Index**:
 
-`````json
+```bash
 {
   "fields": [
     {
@@ -246,7 +246,7 @@ We are using different models for each language to increase the accuracy of the 
     }
   ]
 }
-````
+```
 
 ## Searching and Analyzing Large-Scale Documents using Vector Search
 
@@ -265,7 +265,7 @@ Additionally, you can regulate the speed at which you write into MongoDB or post
 
 ```bash
 sp.lyrics_destination_cluster.stop()
-````
+```
 
 Another benefit of using Atlas Stream Processing and a Kafka cluster is that you can use different models for different types of documents that are more suitable according to the values in the documents (or calculated values from the documents in real time).
 
