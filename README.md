@@ -120,12 +120,12 @@ sp.lyrics_source_cluster.stop()
 sp.lyrics_source_cluster.drop()
 ````
 2. **Create the connection to the MongoDB cluster**
-```json
+````json
 lyrics_source_cluster={$source: { connectionName: "LyricsCluster", db: "streamingvectors", coll : "lyrics", config: {fullDocument : 'updateLookup'}}}
 ````
 3. **Create the pipelines for songs in both languages**
 
-```json
+````json
 only_lyrics_in_english={$match: {operationType: {$in: ["insert", "update"]}, "fullDocument.language": "en", "fullDocument.updated": false}}
 only_lyrics_in_spanish={$match: {operationType: {$in: ["insert", "update"]}, "fullDocument.language": "es", "fullDocument.updated": false}}
 project_year={$project: {"fullDocument.lyrics": 1, "fullDocument._id": 1}}
@@ -133,7 +133,7 @@ send_to_kafka_english={$emit: {connectionName: "KafkaConfluent",topic: "EnglishI
 send_to_kafka_spanish={$emit: {connectionName: "KafkaConfluent",topic: "SpanishInputTopic"}}
 ````
 4. **Create the stream processors using the pipelines**
-```json
+````json
 sp.createStreamProcessor("lyrics_source_cluster_english", [lyrics_source_cluster, only_lyrics_in_english, project_year, send_to_kafka_english])
 
 sp.createStreamProcessor("lyrics_source_cluster_spanish", [lyrics_source_cluster, only_lyrics_in_spanish, project_year, send_to_kafka_spanish])
@@ -162,11 +162,11 @@ sp.lyrics_destination_cluster.stop()
 sp.lyrics_destination_cluster.drop()
 ````
 2. **Create the connection to the MongoDB cluster**
-```json
+````json
 lyrics_output_topic={$source: { connectionName: "KafkaConfluent", topic: "OutputTopic"}}
 ````
 3. **Create the pipeline to update the documents in MongoDB**:
-```json
+````json
 project_metadata = {$project : {last_updated : '$_ts', _stream_meta: 0}}
 update_lyrics_embedding = {
    $merge: {
@@ -221,7 +221,7 @@ We are using different models for each language to increase the accuracy of the 
 
 
 **Spanish Atlas Vector Search Index**:
-````json
+`````json
 {
   "fields": [
     {
@@ -235,7 +235,7 @@ We are using different models for each language to increase the accuracy of the 
 ````
 **English Atlas Vector Search Index**:
 
-````json
+`````json
 {
   "fields": [
     {
