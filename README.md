@@ -21,10 +21,6 @@ This repository provides a detailed walkthrough on how to create embeddings for 
 - [Acknowledgments](#acknowledgments)
 
 
-
-
-
-
 ## Prerequisites
 
 - Python 3.8+
@@ -247,6 +243,14 @@ We are using different models for each language to increase the accuracy of the 
   ]
 }
 ```
+
+We have used a euclidean similarity function when creating the Atlas Vector Search Index as "sentence-transformers" uses a pre-trained model that generates dense vectors. 
+
+Euclidean similarity function is useful for dense data where specific values matter (e.g. image similarity)
+
+Additionally, cosine similarity (based on the angle between vectors) is useful when you have sparse data where orientation is more important (e.g. text concepts and themes). 
+
+You could use dot product (based on angles between vectors and includes vector magnitudes) for sparse data where both orientation and intensity matter.
 
 ## Searching and Analyzing Large-Scale Documents using Vector Search
 

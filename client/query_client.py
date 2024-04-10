@@ -11,8 +11,7 @@ def main():
     
     args = parser.parse_args()
     # Use getpass for password to hide it from command line history and other users 
-    #pwd = getpass(prompt="Enter MongoDB Password: ") if not args.password else args.password
-    pwd = "passwordthree"
+    pwd = getpass(prompt="Enter MongoDB Password: ") if not args.password else args.password
 
     client = pymongo.MongoClient('mongodb+srv://{}:{}@{}/'.format(args.username, pwd, args.hostname)) 
     db = client["streamingvectors"]
