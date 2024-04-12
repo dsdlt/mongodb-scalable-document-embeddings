@@ -263,15 +263,14 @@ python3 client/query_client.py
 
 ## Conclusion
 
-This event driven architecture will allow you to scale horizontally and vertically, adding more workers that consume events from the topics thanks to Atlas Stream Processing.
-
-Additionally, you can regulate the speed at which you write into MongoDB or postponing the update to later on in the day by stopping the processor in Atlas Stream Processing.
+This event-driven architecture will allow you to scale horizontally and vertically, adding more workers that consume events from the topics thanks to Atlas Stream Processing.
+Additionally, you can regulate the speed at which you write into MongoDB or postpone the update to later in the day by stopping the processor in Atlas Stream Processing.
 
 ```bash
 sp.lyrics_destination_cluster.stop()
 ```
 
-Another benefit of using Atlas Stream Processing and a Kafka cluster is that you can use different models for different types of documents that are more suitable according to the values in the documents (or calculated values from the documents in real time).
+Another benefit of using Atlas Stream Processing and a Kafka cluster is that you can use different models for different types of documents that are more suitable according to the values in the documents (or calculated values from the documents in real-time).
 
 ## Additional Resources
 You can find additional resources in the [MongoDB Developer Center](https://www.mongodb.com/developer/) and the [MongoDB Atlas Solutions Library](https://www.mongodb.com/solutions/solutions-library)
@@ -280,7 +279,7 @@ More information about Atlas Vector Search [MongoDB.local NYC 2023 - Vector Sear
 
 More information about Atlas Stream Processing in the [Atlas Stream Processing documentation](https://www.mongodb.com/docs/atlas/atlas-sp/overview/)
 
-More information about language specific models and extension of existing sentence embeddings models to other languages [Making Monolingual Sentence Embeddings Multilingual using
+More information about language-specific models and extension of existing sentence embedding models to other languages [Making Monolingual Sentence Embeddings Multilingual using
 Knowledge Distillation](https://arxiv.org/abs/2004.09813)
 
 Find the original dataset at [Kaggle](https://www.kaggle.com/datasets/carlosgdcj/genius-song-lyrics-with-language-information)
@@ -299,7 +298,7 @@ Please ensure that your code adheres to the repo's coding standards and include 
 
 ## Acknowledgments
 
-Thanks to Kaggle team and CARLOSGDCJ to share their lyrics dataset at Genius.
+Thanks to Kaggle team and CARLOSGDCJ for sharing their lyrics dataset at Genius.
 
 MongoDB team for the incredible Atlas Stream Processing and Atlas Vector Search features.
 
