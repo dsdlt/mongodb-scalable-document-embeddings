@@ -50,12 +50,12 @@ This repository provides a detailed walkthrough on how to create embeddings for 
   python3 -m spacy download es_core_news_sm
   ```
 
-## Loading dataset into the cluster
+## Loading the dataset into the cluster
 
 We have included a script in this repository to download the dataset and restore it into MongoDB
 
 1. **Create an account in MongoDB Atlas**:
-We are assuming you have an account in MongoDB Atlas. If not, we recommend you following [this guide](https://www.mongodb.com/docs/guides/atlas/account/)
+If you do not have one, we recommend following [this guide](https://www.mongodb.com/docs/guides/atlas/account/)
 
 2. **Load the data in MongoDB**:
 
@@ -67,10 +67,10 @@ This script will ask for MongoDB cluster information and will load the data usin
 
 ## Configuring a Kafka Cluster in Confluent
 
-To create a Kafka cluster in Confluent follow the instructions in [their documentation](https://docs.confluent.io/cloud/current/clusters/create-cluster.html#create-ak-clusters)
+To create a Kafka cluster in Confluent follow the instructions in [the Confluent documentation](https://docs.confluent.io/cloud/current/clusters/create-cluster.html#create-ak-clusters)
 
 
-Once you have created the cluster, go to cluster settings and then copy the bootstrap URL.
+Once you have created the cluster, go to cluster settings and copy the bootstrap URL.
 
 ![Create a Kafka cluster in Confluent](images/createkafkacluster1.png)
 
@@ -80,34 +80,34 @@ Then, create an API key to connect to your cluster.
 ![Create an API Key for the Kafka cluster](images/createkafkacluster2.png)
 
 
-The next step is to configure the topics that are going to be used in this solution: SpanishInputTopic, EnglishInputTopic and OutputTopic
+The next step is to configure the topics that are going to be used in this solution: SpanishInputTopic, EnglishInputTopic, and OutputTopic
 
 ![Create topics](images/createkafkacluster3.png)
 
 ## Configure the Stream Processing Connection Registry
 
-To configure a new connection, click on the configure button in the Stream Processing cluster, then Connection Registry and add a new connection.
+To configure a new connection, click the configure button in the Stream Processing cluster, then Connection Registry, and add a new connection.
 
-This connection will be created to connect the Atlas Stream Processing instance with the Kafka Cluster.
+This connection will be created to connect the Atlas Stream Processing Instance (SPI) with the Kafka Cluster.
 
-Once you have created your Kafka cluster, Confluent will provide you with the bootstrap server URL, username and password to use in the Connection Registry.
+Once you have created your Kafka cluster, Confluent will provide you with the bootstrap server URL, username, and password to use in the Connection Registry.
 
 ![Configure the Stream Processor Connection to Confluent](images/configurespconnection1.png)
 
-Next, create a connection from the Atlas Stream Processing instance to the MongoDB cluster.
+Next, create a connection from the SPI to the MongoDB cluster.
 
 ![Configure the Stream Processor Connection to Atlas](images/configurespconnection2.png)
 
 
 ## Configuring Atlas Stream Processing
 
-Firstly, we will connect to the Atlas Stream Processing instance
+Firstly, we will connect to the SPI
 
 ```bash
 mongosh "mongodb://atlas-stream-sdjfo1nvi1owinf-q123wf.virginia-usa.a.query.mongodb.net/" --tls --authenticationDatabase admin --username username
 ```
 
-After that, will create a stream processor with a pipeline to filter inserted and updated songs and send only the content of the lyric and the unique id to the corresponding topic in the Kafka cluster.
+After that, you will create a stream processor with a pipeline to filter inserted and updated songs and send only the content of the lyric and the unique id to the corresponding topic in the Kafka cluster.
 
 1. **Stop all previous connections**:
 
@@ -140,7 +140,7 @@ sp.createStreamProcessor("lyrics_source_cluster_spanish", [lyrics_source_cluster
 sp.lyrics_source_cluster_english.start()
 sp.lyrics_source_cluster_spanish.start()
 ```
-In case you want a list of stream processors you can execute the following command:
+You can execute the following command to list available stream processors:
 ```bash
 sp.listStreamProcessors()
 ```
@@ -148,7 +148,7 @@ You can filter stream processors by their name:
 ```bash
 sp.listStreamProcessors({name : 'lyrics_source_cluster_english'})
 ```
-Now we will create the connection between the output topic from the Kafka cluster and Stream Processing
+Now we will create the connection between the output topic from the Kafka cluster and Atlas  Stream Processing
 
 
 1. **Stop all previous connections**
@@ -157,7 +157,7 @@ Now we will create the connection between the output topic from the Kafka cluste
 sp.lyrics_destination_cluster.stop()
 sp.lyrics_destination_cluster.drop()
 ```
-2. **Create the connection to the MongoDB cluster**
+2. **Create the connection to the Kafka cluster**
 ```bash
 lyrics_output_topic={$source: { connectionName: "KafkaConfluent", topic: "OutputTopic"}}
 ```
@@ -202,7 +202,7 @@ python3 server/metadataservice.py -l english
 python3 server/metadataservice.py -l spanish
 ```
 
-After executing the metadata service, the messages will start to appear in the Kafka cluster topics.
+After executing the metadata service, the messages will start appearing in the Kafka cluster topics.
 
 ![Kafka cluster topics with messages](images/kafkaclusterrunning1.png)
 ![Kafka cluster topics throughput](images/kafkaclusterrunning2.png)
@@ -213,7 +213,7 @@ You have to create an index in the field lyrics_embeddings which is where the ou
 
 ![Create Atlas Vector Search Index](images/createatlasvectorsearchindex3.png)
 
-We are using different models for each language to increase the accuracy of the semantic search based on the language. Each model has created a different embeddings lenght so the embeddings is being written into different fields: lyrics_embeddings_es and lyrics_embeddings_en
+We are using different models for each language to increase the accuracy of the semantic search based on the language. Each model has created a different embeddings length so the embeddings are being written into different fields: lyrics_embeddings_es and lyrics_embeddings_en
 
 
 **Spanish Atlas Vector Search Index**:
@@ -244,13 +244,13 @@ We are using different models for each language to increase the accuracy of the 
 }
 ```
 
-We have used a euclidean similarity function when creating the Atlas Vector Search Index as "sentence-transformers" uses a pre-trained model that generates dense vectors. 
+We have used a Euclidean similarity function when creating the Atlas Vector Search Index as "sentence-transformers" uses a pre-trained model that generates dense vectors. 
 
-Euclidean similarity function is useful for dense data where specific values matter (e.g. image similarity)
+The Euclidean similarity function is useful for dense data where specific values matter (e.g. image similarity)
 
 Additionally, cosine similarity (based on the angle between vectors) is useful when you have sparse data where orientation is more important (e.g. text concepts and themes). 
 
-You could use dot product (based on angles between vectors and includes vector magnitudes) for sparse data where both orientation and intensity matter.
+You could use dot product (based on angles between vectors and include vector magnitudes) for sparse data where orientation and intensity matter.
 
 ## Searching and Analyzing Large-Scale Documents using Vector Search
 
